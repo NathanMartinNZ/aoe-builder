@@ -1,9 +1,5 @@
 <script lang="ts">
   import { units, createUnit } from "../../stores";
-
-  function handleCreateUnit() {
-
-  }
 </script>
 
 <h1>Create</h1>

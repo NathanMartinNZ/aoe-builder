@@ -24,7 +24,7 @@ const createUnit = (unitName: string) => {
 		let unitsCopy = [...currentUnits];
 		let unit = unitsCopy.find((unit) => unit.name === unitName);
 
-		// Check if there are enough resources then update relevant resources
+		// Check if there are enough resources then update relevant resource amounts
 		resources.update((currentResources) => {
 			let resourcesCopy = [...currentResources];
 			unit?.cost.forEach((cost) => {
@@ -43,7 +43,12 @@ const createUnit = (unitName: string) => {
 
 		// Update unit amount if resources requirements are met
 		if (unit && resourceRequirementsMet) {
-			unit.amountCreated = unit.amountCreated + 1;
+			setTimeout(() => {
+				if (unit) {
+					unit.amountCreated = unit.amountCreated + 1;
+					console.log('created unit', unit.amountCreated);
+				}
+			}, unit?.ttb * 1000);
 		}
 		return unitsCopy;
 	});
