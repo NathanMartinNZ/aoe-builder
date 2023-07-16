@@ -16,8 +16,9 @@ const resourceJobs = writable([
 	{
 		name: 'sheep',
 		resourceName: 'food',
-		resourceRatePerSec: 1,
+		resourceRatePerSec: 0.9,
 		totalResourceAvailable: 100,
+		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/5/5a/Sheep_aoe2DE.png'
 	}
 ]);
@@ -49,6 +50,7 @@ const unitsCreated = writable([
 		id: crypto.randomUUID(),
 		name: 'villager',
 		jobId: '',
+		resourcesGathered: 0,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
 	},
@@ -56,6 +58,7 @@ const unitsCreated = writable([
 		id: crypto.randomUUID(),
 		name: 'villager',
 		jobId: '',
+		resourcesGathered: 0,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
 	},
@@ -63,6 +66,7 @@ const unitsCreated = writable([
 		id: crypto.randomUUID(),
 		name: 'villager',
 		jobId: '',
+		resourcesGathered: 0,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
 	}
@@ -140,7 +144,7 @@ const createUnit = (unitName: string) => {
 			id: crypto.randomUUID(),
 			name: unitDetails.name,
 			jobId: '',
-			income: null,
+			resourcesGathered: 0,
 			ready: false,
 			timeWhenReady: date.setSeconds(date.getSeconds() + unitDetails.ttb)
 		};
@@ -190,7 +194,63 @@ const addUnitCreatedAssignedJob = (job: string) => {
 
 const gameTick = writable(0, () => {
 	let interval = setInterval(() => {
+		// Increment game timer by 1 second
 		gameTick.update((value) => value + 1);
+
+		// Increment villager's resourcesGathered value
+		let interactableResourceObjectsArr: any;
+		let unsubscribeInteractableResourceObjects = interactableResourceObjects.subscribe(
+			(arr: any) => {
+				interactableResourceObjectsArr = arr;
+			}
+		);
+		unsubscribeInteractableResourceObjects();
+
+		let resourceJobsArr: any;
+		let unsubscribeResourceJobs = resourceJobs.subscribe((arr: any) => {
+			resourceJobsArr = arr;
+		});
+		unsubscribeResourceJobs();
+
+		unitsCreated.update((currentUnitsCreated) => {
+			let unitsCreatedCopy = [...currentUnitsCreated];
+			// Loop over unitsCreated
+			unitsCreatedCopy.forEach((unitCreated) => {
+				// Loop over resourceJobs to find match
+				interactableResourceObjectsArr.forEach((job: any) => {
+					const resourceJobDetails = resourceJobsArr.find(
+						(resourceJob: any) => resourceJob.name === job.name
+					);
+					// Increment resourcesGathered with the resourceRatePerSec
+					if (unitCreated.jobId === job.id) {
+						unitCreated.resourcesGathered =
+							unitCreated.resourcesGathered + resourceJobDetails.resourceRatePerSec;
+					}
+					// If resourcesGathered is over the storage limit, deposit into resources and reset resourcesGathered to 0
+					if (unitCreated.resourcesGathered >= resourceJobDetails.villagerCarryCapacity) {
+						resources.update((currentResources) => {
+							// Increment resource amount
+							let resourcesCopy = [...currentResources];
+							let resource = resourcesCopy.find(
+								(resource) => resource.name === resourceJobDetails.resourceName
+							);
+
+							if (resource) {
+								// Increment resource amount
+								resource.amount = resource.amount + Math.floor(unitCreated.resourcesGathered);
+
+								// Set resourcesGathered to 0
+								unitCreated.resourcesGathered = 0;
+							}
+
+							return resourcesCopy;
+						});
+					}
+				});
+			});
+
+			return unitsCreatedCopy;
+		});
 	}, 1000);
 
 	return () => {
