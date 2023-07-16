@@ -7,7 +7,7 @@
 {#each $unitsCreated as unit(unit.id)}
   <div>
     {unit.name}
-    {unit.job}
+    {unit.jobId}
     {unit.ready}
   </div>
 {/each}
