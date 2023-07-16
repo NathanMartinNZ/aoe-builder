@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { units, createUnit } from "../../stores";
+  import { unitsAvailable, createUnit, unitsCreated } from "../../stores";
 </script>
 
 <h1>Create</h1>
 
-{#each $units as unit(unit.name)}
+{#each $unitsAvailable as unit(unit.name)}
   <button on:click={() => createUnit(unit.name)}>
     <img src="{unit.icon}" alt="{unit.name}" />
   </button>
 {/each}
 
-<button on:click={() => console.log($units)}>Test</button>
+<button on:click={() => console.log($unitsCreated)}>Test</button>

@@ -7,27 +7,41 @@ const resources = writable([
 	{ name: 'stone', amount: 200 }
 ]);
 
-const units = writable([
+const unitsAvailable = writable([
 	{
 		name: 'villager',
 		cost: [{ name: 'food', amount: 50 }],
 		ttb: 25,
-		icon: 'https://static.wikia.nocookie.net/ageofempires/images/6/68/MaleVillDE.jpg',
-		amountCreated: 3
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/6/68/MaleVillDE.jpg'
+	}
+]);
+
+const unitsCreated = writable([
+	{
+		id: crypto.randomUUID(),
+		name: 'villager',
+		income: null,
+		incomeGenerationStartTime: new Date().setSeconds(new Date().getSeconds() + 0)
 	}
 ]);
 
 const createUnit = (unitName: string) => {
-	units.update((currentUnits) => {
+	unitsCreated.update((currentUnitsCreated) => {
 		let resourceRequirementsMet = true;
-		// Get unit
-		let unitsCopy = [...currentUnits];
-		let unit = unitsCopy.find((unit) => unit.name === unitName);
+		// Get unit details
+		let unitsCreatedCopy = [...currentUnitsCreated];
+		let newUnit: any;
+		let unitDetails: any;
+		let unsubscribe = unitsAvailable.subscribe((arr) => {
+			const foundUnit = arr.find((unit) => unit.name === unitName);
+			unitDetails = foundUnit;
+		});
+		unsubscribe();
 
 		// Check if there are enough resources then update relevant resource amounts
 		resources.update((currentResources) => {
 			let resourcesCopy = [...currentResources];
-			unit?.cost.forEach((cost) => {
+			unitDetails?.cost.forEach((cost: { name: string; amount: number }) => {
 				resourcesCopy.forEach((resource) => {
 					if (resource.name === cost.name) {
 						if (resource.amount - cost.amount >= 0) {
@@ -42,16 +56,19 @@ const createUnit = (unitName: string) => {
 		});
 
 		// Update unit amount if resources requirements are met
-		if (unit && resourceRequirementsMet) {
-			setTimeout(() => {
-				if (unit) {
-					unit.amountCreated = unit.amountCreated + 1;
-					console.log('created unit', unit.amountCreated);
-				}
-			}, unit?.ttb * 1000);
+		if (unitDetails && resourceRequirementsMet) {
+			let date = new Date();
+			newUnit = {
+				id: crypto.randomUUID(),
+				name: unitDetails.name,
+				income: null,
+				incomeGenerationStartTime: date.setSeconds(date.getSeconds() + unitDetails.ttb)
+			};
+			// Push new unit to array
+			unitsCreatedCopy.push(newUnit);
 		}
-		return unitsCopy;
+		return unitsCreatedCopy;
 	});
 };
 
-export { resources, units, createUnit };
+export { resources, unitsAvailable, createUnit, unitsCreated };
