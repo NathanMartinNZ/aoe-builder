@@ -7,6 +7,16 @@ const resources = writable([
 	{ name: 'stone', amount: 200 }
 ]);
 
+const jobs = writable([
+	{
+		name: 'sheep',
+		incomeName: 'food',
+		incomeRatePerSec: 1,
+		totalIncomeAvailable: 100,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/5/5a/Sheep_aoe2DE.png'
+	}
+]);
+
 const unitsAvailable = writable([
 	{
 		name: 'villager',
@@ -20,8 +30,10 @@ const unitsCreated = writable([
 	{
 		id: crypto.randomUUID(),
 		name: 'villager',
+		job: null,
 		income: null,
-		incomeGenerationStartTime: new Date().setSeconds(new Date().getSeconds() + 0)
+		ready: true,
+		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
 	}
 ]);
 
@@ -55,14 +67,16 @@ const createUnit = (unitName: string) => {
 			return resourcesCopy;
 		});
 
-		// Update unit amount if resources requirements are met
+		// Create unit amount if resources requirements are met
 		if (unitDetails && resourceRequirementsMet) {
 			let date = new Date();
 			newUnit = {
 				id: crypto.randomUUID(),
 				name: unitDetails.name,
+				job: null,
 				income: null,
-				incomeGenerationStartTime: date.setSeconds(date.getSeconds() + unitDetails.ttb)
+				ready: false,
+				timeWhenReady: date.setSeconds(date.getSeconds() + unitDetails.ttb)
 			};
 			// Push new unit to array
 			unitsCreatedCopy.push(newUnit);
@@ -71,4 +85,19 @@ const createUnit = (unitName: string) => {
 	});
 };
 
-export { resources, unitsAvailable, createUnit, unitsCreated };
+const updateUnitsCreatedStatus = (unitIds: string[]) => {
+	unitsCreated.update((currentUnitsCreated) => {
+		let currentUnitsCreatedCopy = [...currentUnitsCreated];
+
+		unitIds.forEach((unitId) => {
+			let unitToUpdate = currentUnitsCreatedCopy.find((unit) => unit.id === unitId);
+			if (unitToUpdate) {
+				unitToUpdate.ready = true;
+			}
+		});
+
+		return currentUnitsCreated;
+	});
+};
+
+export { resources, jobs, unitsAvailable, createUnit, unitsCreated, updateUnitsCreatedStatus };
