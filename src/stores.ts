@@ -49,7 +49,6 @@ const unitsCreated = writable([
 		id: crypto.randomUUID(),
 		name: 'villager',
 		jobId: '',
-		income: null,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
 	},
@@ -57,7 +56,6 @@ const unitsCreated = writable([
 		id: crypto.randomUUID(),
 		name: 'villager',
 		jobId: '',
-		income: null,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
 	},
@@ -65,7 +63,6 @@ const unitsCreated = writable([
 		id: crypto.randomUUID(),
 		name: 'villager',
 		jobId: '',
-		income: null,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
 	}
@@ -142,7 +139,7 @@ const createUnit = (unitName: string) => {
 		newUnit = {
 			id: crypto.randomUUID(),
 			name: unitDetails.name,
-			job: '',
+			jobId: '',
 			income: null,
 			ready: false,
 			timeWhenReady: date.setSeconds(date.getSeconds() + unitDetails.ttb)
@@ -176,13 +173,14 @@ const addUnitCreatedAssignedJob = (job: string) => {
 		);
 		// Assign resource job
 		if (unitCreatedReadyForWork) {
+			// Update resource jobId for unitCreatedReadyForWork
 			let resourceJob: any;
 			let unsubscribeInteractableResourceObjects = interactableResourceObjects.subscribe((arr) => {
 				const foundResourceJob = arr.find((obj) => obj.name === job);
-				resourceJob = foundResourceJob?.id;
+				resourceJob = foundResourceJob;
 			});
 			unsubscribeInteractableResourceObjects();
-			unitCreatedReadyForWork.jobId = resourceJob;
+			unitCreatedReadyForWork.jobId = resourceJob.id;
 		}
 		// TODO: Assign building job
 
@@ -190,7 +188,18 @@ const addUnitCreatedAssignedJob = (job: string) => {
 	});
 };
 
+const gameTick = writable(0, () => {
+	let interval = setInterval(() => {
+		gameTick.update((value) => value + 1);
+	}, 1000);
+
+	return () => {
+		clearInterval(interval);
+	};
+});
+
 export {
+	gameTick,
 	population,
 	resources,
 	resourceJobs,
