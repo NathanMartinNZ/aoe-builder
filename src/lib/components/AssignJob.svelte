@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { jobs, unitsCreated, updateUnitsCreatedStatus } from "../../stores";
+  import { jobs, unitsCreated, updateUnitsCreatedStatus, addUnitCreatedAssignedJob} from "../../stores";
 
   // Periodically check for villagers ready to work
   onMount(() => {
@@ -15,13 +15,13 @@
   })
 
   // Filter on villagers that don't have an assigned job and are ready to work
-  $: villagersNotAssigned = $unitsCreated.filter((unit) => unit.name === "villager" && unit.job === null && unit.ready)
+  $: villagersNotAssigned = $unitsCreated.filter((unit) => unit.name === "villager" && unit.job === '' && unit.ready)
 </script>
 
 <h1>Assign Job</h1>
 
 {#each $jobs as job(job.name)}
-  <button on:click={() => console.log(job.name)}>
+  <button on:click={() => addUnitCreatedAssignedJob(job.name)}>
     <img src="{job.icon}" alt="{job.name}" />
     <span>{villagersNotAssigned.length}</span>
   </button>

@@ -30,7 +30,7 @@ const unitsCreated = writable([
 	{
 		id: crypto.randomUUID(),
 		name: 'villager',
-		job: null,
+		job: '',
 		income: null,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
@@ -73,7 +73,7 @@ const createUnit = (unitName: string) => {
 			newUnit = {
 				id: crypto.randomUUID(),
 				name: unitDetails.name,
-				job: null,
+				job: '',
 				income: null,
 				ready: false,
 				timeWhenReady: date.setSeconds(date.getSeconds() + unitDetails.ttb)
@@ -100,4 +100,26 @@ const updateUnitsCreatedStatus = (unitIds: string[]) => {
 	});
 };
 
-export { resources, jobs, unitsAvailable, createUnit, unitsCreated, updateUnitsCreatedStatus };
+const addUnitCreatedAssignedJob = (job: string) => {
+	unitsCreated.update((currentUnitsCreated) => {
+		let currentUnitsCreatedCopy = [...currentUnitsCreated];
+		let unitCreatedReadyForWork = currentUnitsCreatedCopy.find(
+			(unit) => unit.name === 'villager' && unit.job === '' && unit.ready
+		);
+		if (unitCreatedReadyForWork) {
+			unitCreatedReadyForWork.job = job;
+		}
+
+		return currentUnitsCreated;
+	});
+};
+
+export {
+	resources,
+	jobs,
+	unitsAvailable,
+	createUnit,
+	unitsCreated,
+	updateUnitsCreatedStatus,
+	addUnitCreatedAssignedJob
+};
