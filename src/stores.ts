@@ -1,5 +1,10 @@
 import { writable } from 'svelte/store';
 
+const population = writable({
+	current: 3,
+	limit: 5
+});
+
 const resources = writable([
 	{ name: 'food', amount: 200 },
 	{ name: 'wood', amount: 200 },
@@ -34,27 +39,65 @@ const unitsCreated = writable([
 		income: null,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'villager',
+		job: '',
+		income: null,
+		ready: true,
+		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'villager',
+		job: '',
+		income: null,
+		ready: true,
+		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
 	}
 ]);
 
 const createUnit = (unitName: string) => {
 	unitsCreated.update((currentUnitsCreated) => {
+		let newUnit: any;
 		let resourceRequirementsMet = true;
+
 		// Get unit details
 		let unitsCreatedCopy = [...currentUnitsCreated];
-		let newUnit: any;
 		let unitDetails: any;
-		let unsubscribe = unitsAvailable.subscribe((arr) => {
+		let unsubscribeUnits = unitsAvailable.subscribe((arr) => {
 			const foundUnit = arr.find((unit) => unit.name === unitName);
 			unitDetails = foundUnit;
 		});
-		unsubscribe();
+		unsubscribeUnits();
+
+		// Return original unitsCreated array if no unit details were found
+		if (!unitDetails) {
+			return currentUnitsCreated;
+		}
+
+		// Check if population limit is hit
+		let populationLimitHit = false;
+		let unsubscribePopulation = population.subscribe((obj) => {
+			if (obj.current === obj.limit) {
+				populationLimitHit = true;
+			}
+		});
+		unsubscribePopulation();
+
+		// Return original unitsCreated array if population limit is hit
+		if (populationLimitHit) {
+			return currentUnitsCreated;
+		}
 
 		// Check if there are enough resources then update relevant resource amounts
 		resources.update((currentResources) => {
-			let resourcesCopy = [...currentResources];
+			let resourcesCopy: any;
+			// Check resource requirements
+			resourcesCopy = [...currentResources];
 			unitDetails?.cost.forEach((cost: { name: string; amount: number }) => {
-				resourcesCopy.forEach((resource) => {
+				resourcesCopy.forEach((resource: any) => {
 					if (resource.name === cost.name) {
 						if (resource.amount - cost.amount >= 0) {
 							resource.amount = resource.amount - cost.amount;
@@ -67,20 +110,32 @@ const createUnit = (unitName: string) => {
 			return resourcesCopy;
 		});
 
-		// Create unit amount if resources requirements are met
-		if (unitDetails && resourceRequirementsMet) {
-			let date = new Date();
-			newUnit = {
-				id: crypto.randomUUID(),
-				name: unitDetails.name,
-				job: '',
-				income: null,
-				ready: false,
-				timeWhenReady: date.setSeconds(date.getSeconds() + unitDetails.ttb)
-			};
-			// Push new unit to array
-			unitsCreatedCopy.push(newUnit);
+		// Return original unitsCreated array if resource requirements not met
+		if (!resourceRequirementsMet) {
+			return currentUnitsCreated;
 		}
+
+		// Increment current population count
+		population.update((currentPopulation) => {
+			return {
+				current: currentPopulation.current + 1,
+				limit: currentPopulation.limit
+			};
+		});
+
+		console.log(populationLimitHit);
+
+		let date = new Date();
+		newUnit = {
+			id: crypto.randomUUID(),
+			name: unitDetails.name,
+			job: '',
+			income: null,
+			ready: false,
+			timeWhenReady: date.setSeconds(date.getSeconds() + unitDetails.ttb)
+		};
+		unitsCreatedCopy.push(newUnit);
+
 		return unitsCreatedCopy;
 	});
 };
@@ -115,6 +170,7 @@ const addUnitCreatedAssignedJob = (job: string) => {
 };
 
 export {
+	population,
 	resources,
 	jobs,
 	unitsAvailable,
