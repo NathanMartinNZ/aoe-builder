@@ -12,13 +12,26 @@ const resources = writable([
 	{ name: 'stone', amount: 200 }
 ]);
 
-const jobs = writable([
+const resourceJobs = writable([
 	{
 		name: 'sheep',
-		incomeName: 'food',
-		incomeRatePerSec: 1,
-		totalIncomeAvailable: 100,
+		resourceName: 'food',
+		resourceRatePerSec: 1,
+		totalResourceAvailable: 100,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/5/5a/Sheep_aoe2DE.png'
+	}
+]);
+
+const interactableResourceObjects = writable([
+	{
+		id: crypto.randomUUID(),
+		name: 'sheep',
+		remainingResources: 100
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'sheep',
+		remainingResources: 100
 	}
 ]);
 
@@ -35,7 +48,7 @@ const unitsCreated = writable([
 	{
 		id: crypto.randomUUID(),
 		name: 'villager',
-		job: '',
+		jobId: '',
 		income: null,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
@@ -43,7 +56,7 @@ const unitsCreated = writable([
 	{
 		id: crypto.randomUUID(),
 		name: 'villager',
-		job: '',
+		jobId: '',
 		income: null,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
@@ -51,7 +64,7 @@ const unitsCreated = writable([
 	{
 		id: crypto.randomUUID(),
 		name: 'villager',
-		job: '',
+		jobId: '',
 		income: null,
 		ready: true,
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
@@ -159,11 +172,19 @@ const addUnitCreatedAssignedJob = (job: string) => {
 	unitsCreated.update((currentUnitsCreated) => {
 		let currentUnitsCreatedCopy = [...currentUnitsCreated];
 		let unitCreatedReadyForWork = currentUnitsCreatedCopy.find(
-			(unit) => unit.name === 'villager' && unit.job === '' && unit.ready
+			(unit) => unit.name === 'villager' && unit.jobId === '' && unit.ready
 		);
+		// Assign resource job
 		if (unitCreatedReadyForWork) {
-			unitCreatedReadyForWork.job = job;
+			let resourceJob: any;
+			let unsubscribeInteractableResourceObjects = interactableResourceObjects.subscribe((arr) => {
+				const foundResourceJob = arr.find((obj) => obj.name === job);
+				resourceJob = foundResourceJob?.id;
+			});
+			unsubscribeInteractableResourceObjects();
+			unitCreatedReadyForWork.jobId = resourceJob;
 		}
+		// TODO: Assign building job
 
 		return currentUnitsCreated;
 	});
@@ -172,7 +193,8 @@ const addUnitCreatedAssignedJob = (job: string) => {
 export {
 	population,
 	resources,
-	jobs,
+	resourceJobs,
+	interactableResourceObjects,
 	unitsAvailable,
 	createUnit,
 	unitsCreated,
