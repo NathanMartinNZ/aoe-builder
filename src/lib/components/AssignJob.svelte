@@ -22,7 +22,7 @@
 
 {#each $resourceJobs as job(job.name)}
   <button on:click={() => addUnitCreatedAssignedJob(job.name)}>
-    <img src="{job.icon}" alt="{job.name}" />
+    <img class="icon" src="{job.icon}" alt="{job.name}" />
     <span>{villagersNotAssigned.length}</span>
   </button>
 {/each}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "../../app.css"
   import Timer from "$lib/components/Timer.svelte";
   import Population from "$lib/components/Population.svelte";
   import Resources from "$lib/components/Resources.svelte";

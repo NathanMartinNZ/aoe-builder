@@ -20,6 +20,30 @@ const resourceJobs = writable([
 		totalResourceAvailable: 100,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/5/5a/Sheep_aoe2DE.png'
+	},
+	{
+		name: 'trees',
+		resourceName: 'wood',
+		resourceRatePerSec: 0.39,
+		totalResourceAvailable: 100,
+		villagerCarryCapacity: 10,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/c/c7/Trees_aoe2de.png'
+	},
+	{
+		name: 'goldOres',
+		resourceName: 'gold',
+		resourceRatePerSec: 0.39,
+		totalResourceAvailable: 100,
+		villagerCarryCapacity: 10,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/4/49/Aoe2de_gold.png'
+	},
+	{
+		name: 'stoneOres',
+		resourceName: 'stone',
+		resourceRatePerSec: 0.39,
+		totalResourceAvailable: 100,
+		villagerCarryCapacity: 10,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/7/7d/Aoe2de_stone.png'
 	}
 ]);
 
@@ -33,6 +57,26 @@ const interactableResourceObjects = writable([
 		id: crypto.randomUUID(),
 		name: 'sheep',
 		remainingResources: 100
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'sheep',
+		remainingResources: 100
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'trees',
+		remainingResources: 5000
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'goldOres',
+		remainingResources: 5000
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'stoneOres',
+		remainingResources: 5000
 	}
 ]);
 

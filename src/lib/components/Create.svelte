@@ -6,7 +6,7 @@
 
 {#each $unitsAvailable as unit(unit.name)}
   <button on:click={() => createUnit(unit.name)}>
-    <img src="{unit.icon}" alt="{unit.name}" />
+    <img class="icon" src="{unit.icon}" alt="{unit.name}" />
   </button>
 {/each}
 
