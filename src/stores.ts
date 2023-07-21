@@ -16,7 +16,7 @@ const resourceJobs = writable([
 	{
 		name: 'sheep',
 		resourceName: 'food',
-		resourceRatePerSec: 0.9,
+		resourceRatePerSec: 10, // 0.9
 		totalResourceAvailable: 100,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/5/5a/Sheep_aoe2DE.png'
@@ -25,23 +25,23 @@ const resourceJobs = writable([
 		name: 'trees',
 		resourceName: 'wood',
 		resourceRatePerSec: 0.39,
-		totalResourceAvailable: 100,
+		totalResourceAvailable: 5000,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/c/c7/Trees_aoe2de.png'
 	},
 	{
 		name: 'goldOres',
 		resourceName: 'gold',
-		resourceRatePerSec: 0.39,
-		totalResourceAvailable: 100,
+		resourceRatePerSec: 0.38,
+		totalResourceAvailable: 5000,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/4/49/Aoe2de_gold.png'
 	},
 	{
 		name: 'stoneOres',
 		resourceName: 'stone',
-		resourceRatePerSec: 0.39,
-		totalResourceAvailable: 100,
+		resourceRatePerSec: 0.36,
+		totalResourceAvailable: 5000,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/7/7d/Aoe2de_stone.png'
 	}
@@ -265,10 +265,14 @@ const gameTick = writable(0, () => {
 					const resourceJobDetails = resourceJobsArr.find(
 						(resourceJob: any) => resourceJob.name === job.name
 					);
-					// Increment resourcesGathered with the resourceRatePerSec
+					// Find job object for unitCreated
 					if (unitCreated.jobId === job.id) {
+						console.log(job.id, job.remainingResources);
+						// Increment resourcesGathered with the resourceRatePerSec
 						unitCreated.resourcesGathered =
 							unitCreated.resourcesGathered + resourceJobDetails.resourceRatePerSec;
+						// Decrement remainingResources with the resourceRatePerSec
+						job.remainingResources = job.remainingResources - resourceJobDetails.resourceRatePerSec;
 					}
 					// If resourcesGathered is over the storage limit, deposit into resources and reset resourcesGathered to 0
 					if (unitCreated.resourcesGathered >= resourceJobDetails.villagerCarryCapacity) {
@@ -288,6 +292,23 @@ const gameTick = writable(0, () => {
 							}
 
 							return resourcesCopy;
+						});
+					}
+					// If resources deleted from object, unassign jobs and delete object from interactableResourceObjects
+					if (job.remainingResources <= 0) {
+						console.log(job.id, 'depleted resources');
+						// Unassign from job
+						const unitsAssignedToDepletedJob = unitsCreatedCopy.filter(
+							(unit) => unit.jobId === job.id
+						);
+						console.log(unitsAssignedToDepletedJob);
+						unitsAssignedToDepletedJob.forEach((u) => (u.jobId = ''));
+						// Delete object
+						interactableResourceObjects.update((currentInteractableResourceObjects) => {
+							let interactableResourceObjectsCopy = [...currentInteractableResourceObjects];
+							return interactableResourceObjectsCopy.filter(
+								(interactableResourceObject) => interactableResourceObject.id !== job.id
+							);
 						});
 					}
 				});
