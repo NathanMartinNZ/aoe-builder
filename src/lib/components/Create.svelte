@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { unitsAvailable, createUnit, unitsCreated } from "../../stores";
+  import { unitsAvailable, createUnit, unitsCreated, buildingsAvailable, addUnitCreatedAssignedJob, buildingsCreated, buildingJobOjects, interactableResourceObjects } from "../../stores";
 </script>
 
 <h1>Create</h1>
@@ -10,4 +10,14 @@
   </button>
 {/each}
 
-<button on:click={() => console.log($unitsCreated)}>Test</button>
+{#each $buildingsAvailable as building(building.name)}
+  <button on:click={() => addUnitCreatedAssignedJob(building.name)}>
+    <img class="icon" src="{building.icon}" alt="{building.name}" />
+  </button>
+{/each}
+
+<button on:click={() => console.log($unitsCreated)}>units</button>
+<button on:click={() => console.log($buildingsCreated)}>buildings</button>
+
+<button on:click={() => console.log($interactableResourceObjects)}>unit objects</button>
+<button on:click={() => console.log($buildingJobOjects)}>building objects</button>

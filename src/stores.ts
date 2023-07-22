@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 
 const population = writable({
 	current: 3,
@@ -12,11 +12,26 @@ const resources = writable([
 	{ name: 'stone', amount: 200 }
 ]);
 
+const buildingsAvailable = writable([
+	{
+		name: 'house',
+		cost: [{ name: 'wood', amount: 25 }],
+		populationIncrease: 5,
+		ttb: 25,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/3/37/House_aoe2DE.png'
+	}
+]);
+
+const buildingJobOjects: Writable<{ id: string; name: string; completionTime: number }[]> =
+	writable([]);
+
+const buildingsCreated: Writable<object[]> = writable([]);
+
 const resourceJobs = writable([
 	{
 		name: 'sheep',
 		resourceName: 'food',
-		resourceRatePerSec: 10, // 0.9
+		resourceRatePerSec: 0.9,
 		totalResourceAvailable: 100,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/5/5a/Sheep_aoe2DE.png'
@@ -115,6 +130,36 @@ const unitsCreated = writable([
 		timeWhenReady: new Date().setSeconds(new Date().getSeconds() + 0)
 	}
 ]);
+
+const createBuilding = (buildingName: string) => {
+	buildingsCreated.update((currentBuildingsCreated) => {
+		let buildingsCreatedCopy = [...currentBuildingsCreated];
+		let newBuilding: {} = {};
+
+		// Get building details
+		let buildingDetails: any;
+		let unsubscribeBuildings = buildingsAvailable.subscribe((arr) => {
+			const foundBuilding = arr.find((building) => building.name === buildingName);
+			buildingDetails = foundBuilding;
+		});
+		unsubscribeBuildings();
+
+		newBuilding = {
+			id: crypto.randomUUID(),
+			name: buildingDetails.name
+		};
+		buildingsCreatedCopy.push(newBuilding);
+
+		// Increment population if applicable
+		population.update((currentPopulation) => {
+			let populationCopy = currentPopulation;
+			populationCopy.limit += buildingDetails.populationIncrease;
+			return populationCopy;
+		});
+
+		return buildingsCreatedCopy;
+	});
+};
 
 const createUnit = (unitName: string) => {
 	unitsCreated.update((currentUnitsCreated) => {
@@ -219,8 +264,10 @@ const addUnitCreatedAssignedJob = (job: string) => {
 		let unitCreatedReadyForWork = currentUnitsCreatedCopy.find(
 			(unit) => unit.name === 'villager' && unit.jobId === '' && unit.ready
 		);
-		// Assign resource job
+
+		// Continue if unit is available
 		if (unitCreatedReadyForWork) {
+			// Assign resource job
 			// Update resource jobId for unitCreatedReadyForWork
 			let resourceJob: any;
 			let unsubscribeInteractableResourceObjects = interactableResourceObjects.subscribe((arr) => {
@@ -228,9 +275,62 @@ const addUnitCreatedAssignedJob = (job: string) => {
 				resourceJob = foundResourceJob;
 			});
 			unsubscribeInteractableResourceObjects();
-			unitCreatedReadyForWork.jobId = resourceJob.id;
+			if (resourceJob) {
+				unitCreatedReadyForWork.jobId = resourceJob.id;
+				return currentUnitsCreated;
+			}
+
+			// Assign building job
+			// Get building details
+			let buildingDetails: any;
+			let unsubscribeBuildings = buildingsAvailable.subscribe((arr) => {
+				const foundBuilding = arr.find((building) => building.name === job);
+				buildingDetails = foundBuilding;
+			});
+			unsubscribeBuildings();
+
+			// Stop if no building details found
+			if (!buildingDetails) {
+				return currentUnitsCreated;
+			}
+
+			// Create buildingJobObject
+			let newBuildingJobObjectId = crypto.randomUUID();
+			buildingJobOjects.update((currentBuildingJobObjects) => {
+				let buildJobObjectsCopy = [...currentBuildingJobObjects];
+				buildJobObjectsCopy.push({
+					id: newBuildingJobObjectId,
+					name: job,
+					completionTime: new Date().setSeconds(new Date().getSeconds() + buildingDetails.ttb)
+				});
+				return buildJobObjectsCopy;
+			});
+
+			// Check if there are enough resources then update relevant resource amounts
+			let resourceRequirementsMet = true;
+			resources.update((currentResources) => {
+				let resourcesCopy: any;
+				// Check resource requirements
+				resourcesCopy = [...currentResources];
+				buildingDetails?.cost.forEach((cost: { name: string; amount: number }) => {
+					resourcesCopy.forEach((resource: any) => {
+						if (resource.name === cost.name) {
+							if (resource.amount - cost.amount >= 0) {
+								resource.amount = resource.amount - cost.amount;
+							} else {
+								resourceRequirementsMet = false;
+							}
+						}
+					});
+				});
+				return resourcesCopy;
+			});
+
+			// Assign job if resource requirements are met
+			if (resourceRequirementsMet) {
+				unitCreatedReadyForWork.jobId = newBuildingJobObjectId;
+			}
 		}
-		// TODO: Assign building job
 
 		return currentUnitsCreated;
 	});
@@ -316,6 +416,36 @@ const gameTick = writable(0, () => {
 
 			return unitsCreatedCopy;
 		});
+
+		// Create buildings that have just been finished
+		buildingJobOjects.update((currentBuildingObjects) => {
+			let buildingObjectsCopy = [...currentBuildingObjects];
+			let finishedBuildings = buildingObjectsCopy.filter(
+				(building) => building.completionTime <= new Date().setSeconds(new Date().getSeconds() + 0)
+			);
+
+			// Create building(s)
+			finishedBuildings.forEach((finishedBuilding) => {
+				createBuilding(finishedBuilding.name);
+				// Unassign units from building job
+				unitsCreated.update((currentUnitsCreated) => {
+					let unitsCreatedCopy = [...currentUnitsCreated];
+					let unitsCreatedAssignedBuildingJob = unitsCreatedCopy.filter(
+						(unitCreated) => unitCreated.jobId === finishedBuilding.id
+					);
+					unitsCreatedAssignedBuildingJob.forEach(
+						(unitCreatedAssignedBuilding) => (unitCreatedAssignedBuilding.jobId = '')
+					);
+					return unitsCreatedCopy;
+				});
+			});
+
+			let remainingBuildings = buildingObjectsCopy.filter(
+				(building) => building.completionTime > new Date().setSeconds(new Date().getSeconds() + 0)
+			);
+
+			return remainingBuildings;
+		});
 	}, 1000);
 
 	return () => {
@@ -333,5 +463,8 @@ export {
 	createUnit,
 	unitsCreated,
 	updateUnitsCreatedStatus,
-	addUnitCreatedAssignedJob
+	addUnitCreatedAssignedJob,
+	buildingsAvailable,
+	buildingsCreated,
+	buildingJobOjects
 };

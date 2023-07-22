@@ -3,6 +3,6 @@
 ## Todo:
 
 - Create object for individual boars, deer
-- Increment resources based on villager jobs & gather rates
-- Delete individual sheet, boar, etc. when total available resource amount reaches 0
-- Then remove assigned job from villager
+- Queue villagers (current building at the same time)
+- Add initial delay on collecting resources (i.e. walking to tree line)
+- Reduce subsequent delay on collecting resources IF lumber mill, mining camp is built
