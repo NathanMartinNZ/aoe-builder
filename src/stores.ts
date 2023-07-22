@@ -25,7 +25,7 @@ const buildingsAvailable = writable([
 const buildingJobObjects: Writable<{ id: string; name: string; completionTime: number }[]> =
 	writable([]);
 
-const buildingsCreated: Writable<object[]> = writable([]);
+const buildingsCreated: Writable<{ id: string; name: string; icon: string }[]> = writable([]);
 
 const resourceJobs = writable([
 	{
@@ -149,7 +149,7 @@ const unitsCreated = writable([
 const createBuilding = (buildingName: string) => {
 	buildingsCreated.update((currentBuildingsCreated) => {
 		let buildingsCreatedCopy = [...currentBuildingsCreated];
-		let newBuilding: {} = {};
+		let newBuilding;
 
 		// Get building details
 		let buildingDetails: any;
@@ -161,7 +161,8 @@ const createBuilding = (buildingName: string) => {
 
 		newBuilding = {
 			id: crypto.randomUUID(),
-			name: buildingDetails.name
+			name: buildingDetails.name,
+			icon: buildingDetails.icon
 		};
 		buildingsCreatedCopy.push(newBuilding);
 
@@ -420,7 +421,7 @@ const gameTick = writable(0, () => {
 							return resourcesCopy;
 						});
 					}
-					// If resources deleted from object, unassign jobs and delete object from interactableResourceObjects
+					// If resources depleted from object, unassign jobs and delete object from interactableResourceObjects
 					if (job.remainingResources <= 0) {
 						console.log(job.id, 'depleted resources');
 						// Unassign from job
