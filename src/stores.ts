@@ -80,6 +80,21 @@ const interactableResourceObjects = writable([
 	},
 	{
 		id: crypto.randomUUID(),
+		name: 'sheep',
+		remainingResources: 100
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'sheep',
+		remainingResources: 100
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'sheep',
+		remainingResources: 100
+	},
+	{
+		id: crypto.randomUUID(),
 		name: 'trees',
 		remainingResources: 5000
 	},
@@ -228,7 +243,18 @@ const createUnit = (unitName: string) => {
 
 		console.log(populationLimitHit);
 
+		// Calculate addtional seconds needed to create unit from building
 		let date = new Date();
+		let queue = unitsCreatedCopy.filter(
+			(unitCreated) => unitCreated.name === unitDetails.name && !unitCreated.ready
+		);
+		if (queue.length) {
+			let lastToCreateTime = Math.max(...queue.map((q) => q.timeWhenReady));
+			date = new Date(lastToCreateTime);
+			console.log(queue, lastToCreateTime);
+		}
+
+		// Create new unit
 		newUnit = {
 			id: crypto.randomUUID(),
 			name: unitDetails.name,
