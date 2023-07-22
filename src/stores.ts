@@ -22,7 +22,7 @@ const buildingsAvailable = writable([
 	}
 ]);
 
-const buildingJobOjects: Writable<{ id: string; name: string; completionTime: number }[]> =
+const buildingJobObjects: Writable<{ id: string; name: string; completionTime: number }[]> =
 	writable([]);
 
 const buildingsCreated: Writable<object[]> = writable([]);
@@ -296,7 +296,7 @@ const addUnitCreatedAssignedJob = (job: string) => {
 
 			// Create buildingJobObject
 			let newBuildingJobObjectId = crypto.randomUUID();
-			buildingJobOjects.update((currentBuildingJobObjects) => {
+			buildingJobObjects.update((currentBuildingJobObjects) => {
 				let buildJobObjectsCopy = [...currentBuildingJobObjects];
 				buildJobObjectsCopy.push({
 					id: newBuildingJobObjectId,
@@ -418,7 +418,7 @@ const gameTick = writable(0, () => {
 		});
 
 		// Create buildings that have just been finished
-		buildingJobOjects.update((currentBuildingObjects) => {
+		buildingJobObjects.update((currentBuildingObjects) => {
 			let buildingObjectsCopy = [...currentBuildingObjects];
 			let finishedBuildings = buildingObjectsCopy.filter(
 				(building) => building.completionTime <= new Date().setSeconds(new Date().getSeconds() + 0)
@@ -466,5 +466,5 @@ export {
 	addUnitCreatedAssignedJob,
 	buildingsAvailable,
 	buildingsCreated,
-	buildingJobOjects
+	buildingJobObjects
 };
