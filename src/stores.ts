@@ -27,6 +27,22 @@ const buildingsAvailable = writable([
 		ttb: 35,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/2/28/Lumber_camp_aoe2de.png',
 		depotResourceObject: 'trees'
+	},
+	{
+		name: 'gold_mining_camp',
+		cost: [{ name: 'wood', amount: 100 }],
+		populationIncrease: 0,
+		ttb: 35,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/3/32/Mining_camp_aoe2de.png',
+		depotResourceObject: 'gold_ore'
+	},
+	{
+		name: 'stone_mining_camp',
+		cost: [{ name: 'wood', amount: 100 }],
+		populationIncrease: 0,
+		ttb: 35,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/3/32/Mining_camp_aoe2de.png',
+		depotResourceObject: 'stone_ore'
 	}
 ]);
 
@@ -55,7 +71,7 @@ const resourceJobs = writable([
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/c/c7/Trees_aoe2de.png'
 	},
 	{
-		name: 'goldOres',
+		name: 'gold_ore',
 		resourceName: 'gold',
 		resourceRatePerSec: 0.38,
 		resourceRatePerSecWithoutDepotBuilding: 0.19,
@@ -64,7 +80,7 @@ const resourceJobs = writable([
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/4/49/Aoe2de_gold.png'
 	},
 	{
-		name: 'stoneOres',
+		name: 'stone_ore',
 		resourceName: 'stone',
 		resourceRatePerSec: 0.36,
 		resourceRatePerSecWithoutDepotBuilding: 0.18,
@@ -119,13 +135,13 @@ const interactableResourceObjects = writable([
 	},
 	{
 		id: crypto.randomUUID(),
-		name: 'goldOres',
+		name: 'gold_ore',
 		remainingResources: 5000,
 		hasDepotBuilding: false
 	},
 	{
 		id: crypto.randomUUID(),
-		name: 'stoneOres',
+		name: 'stone_ore',
 		remainingResources: 5000,
 		hasDepotBuilding: false
 	}
@@ -191,7 +207,7 @@ const createBuilding = (buildingName: string) => {
 		interactableResourceObjects.update((currentInteractableResourceObjects) => {
 			let interactableResourceObjectsCopy = [...currentInteractableResourceObjects];
 			let interactableResourceObject = interactableResourceObjectsCopy.find(
-				(obj) => obj.name === buildingDetails.depotResource
+				(obj) => obj.name === buildingDetails.depotResourceObject
 			);
 			if (interactableResourceObject && !interactableResourceObject.hasDepotBuilding) {
 				interactableResourceObject.hasDepotBuilding = true;
@@ -427,7 +443,6 @@ const gameTick = writable(0, () => {
 					);
 					// Find job object for unitCreated
 					if (unitCreated.jobId === job.id) {
-						console.log(job.id, job.remainingResources);
 						// Check if job has a depot building (meaning faster resource gathering)
 						if (job.hasDepotBuilding) {
 							// Increment resourcesGathered with the resourceRatePerSec
