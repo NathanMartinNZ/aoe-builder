@@ -428,9 +428,17 @@ const gameTick = writable(0, () => {
 					// Find job object for unitCreated
 					if (unitCreated.jobId === job.id) {
 						console.log(job.id, job.remainingResources);
-						// Increment resourcesGathered with the resourceRatePerSec
-						unitCreated.resourcesGathered =
-							unitCreated.resourcesGathered + resourceJobDetails.resourceRatePerSec;
+						// Check if job has a depot building (meaning faster resource gathering)
+						if (job.hasDepotBuilding) {
+							// Increment resourcesGathered with the resourceRatePerSec
+							unitCreated.resourcesGathered =
+								unitCreated.resourcesGathered + resourceJobDetails.resourceRatePerSec;
+						} else {
+							// Increment resourcesGathered with the resourceRatePerSecWithoutDepotBuilding
+							unitCreated.resourcesGathered =
+								unitCreated.resourcesGathered +
+								resourceJobDetails.resourceRatePerSecWithoutDepotBuilding;
+						}
 						// Decrement remainingResources with the resourceRatePerSec
 						job.remainingResources = job.remainingResources - resourceJobDetails.resourceRatePerSec;
 					}
