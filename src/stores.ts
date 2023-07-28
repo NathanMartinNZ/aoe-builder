@@ -19,6 +19,14 @@ const buildingsAvailable = writable([
 		populationIncrease: 5,
 		ttb: 25,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/3/37/House_aoe2DE.png'
+	},
+	{
+		name: 'lumber_camp',
+		cost: [{ name: 'wood', amount: 100 }],
+		populationIncrease: 0,
+		ttb: 35,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/2/28/Lumber_camp_aoe2de.png',
+		depotResourceObject: 'trees'
 	}
 ]);
 
@@ -96,17 +104,20 @@ const interactableResourceObjects = writable([
 	{
 		id: crypto.randomUUID(),
 		name: 'trees',
-		remainingResources: 5000
+		remainingResources: 5000,
+		hasDepotBuilding: false
 	},
 	{
 		id: crypto.randomUUID(),
 		name: 'goldOres',
-		remainingResources: 5000
+		remainingResources: 5000,
+		hasDepotBuilding: false
 	},
 	{
 		id: crypto.randomUUID(),
 		name: 'stoneOres',
-		remainingResources: 5000
+		remainingResources: 5000,
+		hasDepotBuilding: false
 	}
 ]);
 
@@ -165,6 +176,20 @@ const createBuilding = (buildingName: string) => {
 			icon: buildingDetails.icon
 		};
 		buildingsCreatedCopy.push(newBuilding);
+
+		// Set interactableResourceObject hasDepotBuilding to true if resource depot building
+		if (buildingDetails.depotResource) {
+			interactableResourceObjects.update((currentInteractableResourceObjects) => {
+				let interactableResourceObjectsCopy = [...currentInteractableResourceObjects];
+				let interactableResourceObject = interactableResourceObjectsCopy.find(
+					(obj) => obj.name === buildingDetails.depotResource
+				);
+				if (interactableResourceObject) {
+					interactableResourceObject.hasDepotBuilding = true;
+				}
+				return interactableResourceObjectsCopy;
+			});
+		}
 
 		// Increment population if applicable
 		population.update((currentPopulation) => {
