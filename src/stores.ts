@@ -40,6 +40,7 @@ const resourceJobs = writable([
 		name: 'sheep',
 		resourceName: 'food',
 		resourceRatePerSec: 0.9,
+		resourceRatePerSecWithoutDepotBuilding: 0.9,
 		totalResourceAvailable: 100,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/5/5a/Sheep_aoe2DE.png'
@@ -48,6 +49,7 @@ const resourceJobs = writable([
 		name: 'trees',
 		resourceName: 'wood',
 		resourceRatePerSec: 0.39,
+		resourceRatePerSecWithoutDepotBuilding: 0.2,
 		totalResourceAvailable: 5000,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/c/c7/Trees_aoe2de.png'
@@ -56,6 +58,7 @@ const resourceJobs = writable([
 		name: 'goldOres',
 		resourceName: 'gold',
 		resourceRatePerSec: 0.38,
+		resourceRatePerSecWithoutDepotBuilding: 0.19,
 		totalResourceAvailable: 5000,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/4/49/Aoe2de_gold.png'
@@ -64,6 +67,7 @@ const resourceJobs = writable([
 		name: 'stoneOres',
 		resourceName: 'stone',
 		resourceRatePerSec: 0.36,
+		resourceRatePerSecWithoutDepotBuilding: 0.18,
 		totalResourceAvailable: 5000,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/7/7d/Aoe2de_stone.png'
@@ -74,32 +78,38 @@ const interactableResourceObjects = writable([
 	{
 		id: crypto.randomUUID(),
 		name: 'sheep',
-		remainingResources: 100
+		remainingResources: 100,
+		hasDepotBuilding: true
 	},
 	{
 		id: crypto.randomUUID(),
 		name: 'sheep',
-		remainingResources: 100
+		remainingResources: 100,
+		hasDepotBuilding: true
 	},
 	{
 		id: crypto.randomUUID(),
 		name: 'sheep',
-		remainingResources: 100
+		remainingResources: 100,
+		hasDepotBuilding: true
 	},
 	{
 		id: crypto.randomUUID(),
 		name: 'sheep',
-		remainingResources: 100
+		remainingResources: 100,
+		hasDepotBuilding: true
 	},
 	{
 		id: crypto.randomUUID(),
 		name: 'sheep',
-		remainingResources: 100
+		remainingResources: 100,
+		hasDepotBuilding: true
 	},
 	{
 		id: crypto.randomUUID(),
 		name: 'sheep',
-		remainingResources: 100
+		remainingResources: 100,
+		hasDepotBuilding: true
 	},
 	{
 		id: crypto.randomUUID(),
@@ -178,18 +188,16 @@ const createBuilding = (buildingName: string) => {
 		buildingsCreatedCopy.push(newBuilding);
 
 		// Set interactableResourceObject hasDepotBuilding to true if resource depot building
-		if (buildingDetails.depotResource) {
-			interactableResourceObjects.update((currentInteractableResourceObjects) => {
-				let interactableResourceObjectsCopy = [...currentInteractableResourceObjects];
-				let interactableResourceObject = interactableResourceObjectsCopy.find(
-					(obj) => obj.name === buildingDetails.depotResource
-				);
-				if (interactableResourceObject) {
-					interactableResourceObject.hasDepotBuilding = true;
-				}
-				return interactableResourceObjectsCopy;
-			});
-		}
+		interactableResourceObjects.update((currentInteractableResourceObjects) => {
+			let interactableResourceObjectsCopy = [...currentInteractableResourceObjects];
+			let interactableResourceObject = interactableResourceObjectsCopy.find(
+				(obj) => obj.name === buildingDetails.depotResource
+			);
+			if (interactableResourceObject && !interactableResourceObject.hasDepotBuilding) {
+				interactableResourceObject.hasDepotBuilding = true;
+			}
+			return interactableResourceObjectsCopy;
+		});
 
 		// Increment population if applicable
 		population.update((currentPopulation) => {
