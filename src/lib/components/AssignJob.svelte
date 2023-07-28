@@ -26,5 +26,3 @@
     <span>{villagersNotAssigned.length}</span>
   </button>
 {/each}
-
-<button on:click={() => console.log(villagersNotAssigned)}>test</button>

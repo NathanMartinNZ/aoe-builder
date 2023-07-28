@@ -9,16 +9,22 @@
   import Buildings from "$lib/components/Buildings.svelte";
 </script>
 
-<Timer />
-
-<Population />
-
-<Resources />
-
-<Create />
-
-<AssignJob />
-
-<Units />
-
-<Buildings />
+<div class="container mx-auto flex flex-col">
+  <div class="container flex gap-6 mb-6">
+    <Resources />
+    <Population />
+    <Timer />
+  </div>
+  
+  <div class="flex">
+    <div class="container flex-1">
+      <Create />
+      <AssignJob />
+    </div>
+  
+    <div class="container flex-1">
+      <Units />
+      <Buildings />
+    </div>
+  </div>
+</div>

@@ -2,4 +2,6 @@
   import { gameTick } from "../../stores";
 </script>
 
-<p>Game time: {$gameTick}</p>
+<div class="flex">
+  <p>{$gameTick}</p>
+</div>

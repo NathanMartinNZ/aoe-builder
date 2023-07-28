@@ -2,7 +2,7 @@
   import { population } from "../../stores";
 </script>
 
-<h1>Population</h1>
-
-<p>Current: {$population.current}</p>
-<p>Limit: {$population.limit}</p>
+<div class="flex gap-1.5">
+  <img src="https://static.wikia.nocookie.net/ageofempires/images/3/3d/Aoe2de_population.png" alt="population" class="icon" />
+  <p>{$population.current}/{$population.limit}</p>
+</div>

@@ -6,10 +6,26 @@ const population = writable({
 });
 
 const resources = writable([
-	{ name: 'food', amount: 200 },
-	{ name: 'wood', amount: 200 },
-	{ name: 'gold', amount: 100 },
-	{ name: 'stone', amount: 200 }
+	{
+		name: 'food',
+		amount: 200,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/5/5f/Aoe2de_food.png'
+	},
+	{
+		name: 'wood',
+		amount: 200,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/8/84/Aoe2de_wood.png'
+	},
+	{
+		name: 'gold',
+		amount: 100,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/4/49/Aoe2de_gold.png'
+	},
+	{
+		name: 'stone',
+		amount: 200,
+		icon: 'https://static.wikia.nocookie.net/ageofempires/images/7/7d/Aoe2de_stone.png'
+	}
 ]);
 
 const buildingsAvailable = writable([
@@ -55,8 +71,8 @@ const resourceJobs = writable([
 	{
 		name: 'sheep',
 		resourceName: 'food',
-		resourceRatePerSec: 0.9,
-		resourceRatePerSecWithoutDepotBuilding: 0.9,
+		resourceRatePerSec: 0.33,
+		resourceRatePerSecWithoutDepotBuilding: 0.33,
 		totalResourceAvailable: 100,
 		villagerCarryCapacity: 10,
 		icon: 'https://static.wikia.nocookie.net/ageofempires/images/5/5a/Sheep_aoe2DE.png'
@@ -91,6 +107,18 @@ const resourceJobs = writable([
 ]);
 
 const interactableResourceObjects = writable([
+	{
+		id: crypto.randomUUID(),
+		name: 'sheep',
+		remainingResources: 100,
+		hasDepotBuilding: true
+	},
+	{
+		id: crypto.randomUUID(),
+		name: 'sheep',
+		remainingResources: 100,
+		hasDepotBuilding: true
+	},
 	{
 		id: crypto.randomUUID(),
 		name: 'sheep',
@@ -529,7 +557,7 @@ const gameTick = writable(0, () => {
 
 			return remainingBuildings;
 		});
-	}, 1000);
+	}, 588.23529411);
 
 	return () => {
 		clearInterval(interval);

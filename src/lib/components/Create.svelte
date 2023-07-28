@@ -15,9 +15,3 @@
     <img class="icon" src="{building.icon}" alt="{building.name}" />
   </button>
 {/each}
-
-<button on:click={() => console.log($unitsCreated)}>units</button>
-<button on:click={() => console.log($buildingsCreated)}>buildings</button>
-
-<button on:click={() => console.log($interactableResourceObjects)}>unit objects</button>
-<button on:click={() => console.log($buildingJobObjects)}>building objects</button>
