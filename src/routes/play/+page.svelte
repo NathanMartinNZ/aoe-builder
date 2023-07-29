@@ -3,6 +3,7 @@
   import Timer from "$lib/components/Timer.svelte";
   import Population from "$lib/components/Population.svelte";
   import Resources from "$lib/components/Resources.svelte";
+  import Idle from "$lib/components/Idle.svelte";
   import Create from "$lib/components/Create.svelte";
   import AssignJob from "$lib/components/AssignJob.svelte";
   import Units from "$lib/components/Units.svelte";
@@ -18,6 +19,7 @@
   
   <div class="flex">
     <div class="container flex-1">
+      <Idle />
       <Create />
       <AssignJob />
     </div>

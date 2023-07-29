@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { resourceJobs, unitsCreated, updateUnitsCreatedStatus, addUnitCreatedAssignedJob} from "../../stores";
+  import { resourceJobs, unitsCreated, updateUnitsCreatedStatus, addUnitCreatedAssignedJob, interactableResourceObjects} from "../../stores";
 
   // Periodically check for villagers ready to work
   onMount(() => {
@@ -11,18 +11,16 @@
         console.log('store')
         updateUnitsCreatedStatus(villagersNewlyReadyToWork)
       }
-    }, 1000)
+    }, 588.23529411)
   })
-
-  // Filter on villagers that don't have an assigned job and are ready to work
-  $: villagersNotAssigned = $unitsCreated.filter((unit) => unit.name === "villager" && unit.jobId === '' && unit.ready)
 </script>
 
-<h1>Assign Job</h1>
+<h1 class="text-xl mb-2">Assign Job</h1>
 
-{#each $resourceJobs as job(job.name)}
-  <button on:click={() => addUnitCreatedAssignedJob(job.name)}>
-    <img class="icon" src="{job.icon}" alt="{job.name}" />
-    <span>{villagersNotAssigned.length}</span>
-  </button>
-{/each}
+<div class="flex flex-wrap gap-1.5">
+  {#each $resourceJobs as job(job.name)}
+    <button on:click={() => addUnitCreatedAssignedJob(job.name)}>
+      <img class="icon rounded-md" src="{job.icon}" alt="{job.name}" />
+    </button>
+  {/each}
+</div>
