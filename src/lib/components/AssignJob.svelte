@@ -20,7 +20,7 @@
 <div class="flex flex-wrap gap-1.5">
   {#each $resourceJobs as job(job.name)}
     <button on:click={() => addUnitCreatedAssignedJob(job.name)}>
-      <img class="icon rounded-md" src="{job.icon}" alt="{job.name}" />
+      <img class="icon rounded-md" src="{job.icon}" alt="{job.name}" title="{job.name}" />
     </button>
   {/each}
 </div>

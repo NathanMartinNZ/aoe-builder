@@ -7,13 +7,13 @@
 <div class="flex flex-wrap gap-1.5 mb-4">
   {#each $unitsAvailable as unit(unit.name)}
     <button on:click={() => createUnit(unit.name)}>
-      <img class="icon rounded-md" src="{unit.icon}" alt="{unit.name}" />
+      <img class="icon rounded-md" src="{unit.icon}" alt="{unit.name}" title="{unit.name}" />
     </button>
   {/each}
   
   {#each $buildingsAvailable as building(building.name)}
     <button on:click={() => addUnitCreatedAssignedJob(building.name)}>
-      <img class="icon rounded-md" src="{building.icon}" alt="{building.name}" />
+      <img class="icon rounded-md" src="{building.icon}" alt="{building.name}" title="{building.name}" />
     </button>
   {/each}
 </div>

@@ -13,7 +13,7 @@
   {#each $resources as resource(resource.name)}
     <div class="flex gap-1.5">
       <div class="relative">
-        <img src="{resource.icon}" alt="{resource.name}" class="icon rounded-md" />
+        <img src="{resource.icon}" alt="{resource.name}" title="{resource.name}" class="icon rounded-md" />
         <span class="absolute bottom-0 right-0 text-xs bg-black text-white px-1 rounded-sm">{getUnitCountOnResource(resource.name)}</span>
       </div>
       {resource.amount}
